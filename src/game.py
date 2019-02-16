@@ -16,9 +16,9 @@ class Game:
         RED = (255, 0, 0)
 
         # Open a new window
-        size = (700, 500)
+        size = (1400, 1000)
         screen = pygame.display.set_mode(size)
-        pygame.display.set_caption("My First Game")
+        pygame.display.set_caption("Drift King")
 
         # The clock will be used to control how fast the screen updates
         clock = pygame.time.Clock()
