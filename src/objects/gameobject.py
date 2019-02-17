@@ -14,6 +14,11 @@ class GameObject(ABC):
 
         self._tick(keys)
 
+    @property
+    @abstractmethod
+    def bounding_box(self):
+        pass
+
     @abstractmethod
     def _tick(self, keys):
         pass

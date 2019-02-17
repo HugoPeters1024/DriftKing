@@ -3,6 +3,7 @@ from math import pi, sin, cos, acos, atan, atan2
 
 from src.images.images import CAR, TIRE
 from src.objects.gameobject import GameObject
+from src.utils import Polygon
 from src.utils.Vector2 import Vector2
 from src.utils.mathx import sign
 
@@ -14,7 +15,7 @@ class Car(GameObject):
         self.mass = 200
         self.length = 2
         self.wheel_angle = 0.0
-        self.max_wheel_angle = 0.2
+        self.max_wheel_angle = 0.4
         self.torque = 0
         self.gears = [
             (4, 60),
@@ -29,6 +30,11 @@ class Car(GameObject):
         self.drag_constant = 0.4257
         self.rolling_resistance_constant = 6
         self.cornering_stiffness = 0.4
+
+    @property
+    def bounding_box(self):
+        return Polygon(self.x, self.y)
+
 
     def draw(self, draw, screen, camera):
         (cx, cy) = CAR.get_rect().center
@@ -75,7 +81,8 @@ class Car(GameObject):
             self.breakingForce = 10
         else:
             self.breakingForce = 0
-        print(ready_force)
+
+        self.torque *= 0.98
 
     @property
     def traction(self):
@@ -83,9 +90,9 @@ class Car(GameObject):
 
     @property
     def brakes(self):
-        forward_speed = (self.direction - self.velocity).y
-        if forward_speed > 0:
-            return -self.direction * self.breakingForce
+        forward_speed = abs((self.direction - self.velocity).y)
+        if forward_speed > 0.1:
+            return -self.direction * min(self.breakingForce, forward_speed)
         return Vector2(0, 0)
 
     @property
@@ -112,7 +119,7 @@ class Car(GameObject):
         front_force = front
 
         total = rear_force + cos(self.wheel_angle) * front_force
-        self.torque = (rear_force * self.speed) / self.mass * 0.16 * self.cornering_stiffness
+        # self.torque += (-rear_force + cos(self.wheel_angle) * front_force) / 90.0
 
         return Vector2(-self.velocity.y, self.velocity.x) * -total * self.cornering_stiffness
 

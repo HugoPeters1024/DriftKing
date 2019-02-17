@@ -5,6 +5,10 @@ from src.utils.Vector2 import Vector2
 
 
 class Square(GameObject):
+    @property
+    def bounding_box(self):
+        pass
+
     def _tick(self, keys):
         self.velocity *= Vector2(0.99, 0.99)
         if keys[pygame.K_LEFT]:

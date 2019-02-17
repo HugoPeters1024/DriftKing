@@ -33,6 +33,9 @@ class Vector2:
     def __neg__(self):
         return Vector2(-self.x, -self.y)
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
     def __abs__(self):
         return Vector2(abs(self.x), abs(self.y))
 
@@ -71,7 +74,6 @@ class Vector2:
         if l > 0:
             return self / self.length
         return Vector2(0, 0)
-
 
     def rotate(self, degrees):
         cs = cos(degrees)

@@ -2,6 +2,10 @@ from src.objects.gameobject import GameObject
 
 
 class Wall(GameObject):
+    @property
+    def bounding_box(self):
+        pass
+
     def __init__(self, x1, y1, x2, y2):
         super().__init__()
         self.x1 = x1

@@ -1,6 +1,8 @@
 # Import the pygame library and initialise the game engine
 import pygame
 
+from src.utils.Line import Line
+from src.utils.Polygon import Polygon
 from src.utils.Vector2 import Vector2
 
 
@@ -25,13 +27,14 @@ class Game:
 
         # The clock will be used to control how fast the screen updates
         clock = pygame.time.Clock()
-        camera = Vector2(0, 0)
+        tick = 0
 
         carryOn = True
 
         # -------- Main Program Loop -----------
         while carryOn:
-            camera = -self.car.position + size/2
+            tick += 1
+            camera = -self.car.position + size / 2
             # --- Main event loop
             for event in pygame.event.get():  # User did something
                 if event.type == pygame.QUIT:  # If user clicked close
@@ -40,7 +43,25 @@ class Game:
 
             # First, clear the screen to black.
             screen.fill(BLACK)
-            # The you can draw different shapes and lines or add text to your background stage.
+
+            square = Polygon(points=[Vector2(0, 0), Vector2(100, 0), Vector2(100, 100), Vector2(0, 100)])
+            square.draw(pygame.draw, screen)
+
+            (mx, my) = pygame.mouse.get_pos()
+            square2 = Polygon([Vector2(mx, my), Vector2(mx + 50, my), Vector2(mx + 50, my + 50), Vector2(mx, my + 50)]).rotated(tick/100.0)
+            square2.draw(pygame.draw, screen)
+            print(square.intersects(square2))
+
+            """
+            line = Line(40, 40, 150, 150)
+            line.draw(pygame.draw, screen)
+
+            (mx, my) = pygame.mouse.get_pos()
+            line2 = Line(mx-20, my+10, mx+40, my+30)
+            line2.draw(pygame.draw, screen)
+
+            print(line.intersects(line2))
+            """
 
             keys = pygame.key.get_pressed()
             for entity in self.game_objects:
