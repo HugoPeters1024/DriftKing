@@ -33,6 +33,9 @@ class Vector2:
     def __neg__(self):
         return Vector2(-self.x, -self.y)
 
+    def __abs__(self):
+        return Vector2(abs(self.x), abs(self.y))
+
     def __str__(self):
         return f"({self.x}, {self.y})"
 
@@ -40,9 +43,22 @@ class Vector2:
     def dot(a, b):
         return a.x * b.x + a.y * b.y
 
+    @staticmethod
+    def Sangle(a, b):
+        return acos(Vector2.dot(a, b) * (a.length * b.length))
+
     @property
     def angle(self):
+        """Gets the angle with the x-unit vector"""
         return atan2(self.y, self.x)
+
+    @property
+    def normalized(self):
+        l = self.length
+        if l > 0:
+            return self / self.length
+        return Vector2(0, 0)
+
 
     def rotate(self, degrees):
         cs = cos(degrees)
