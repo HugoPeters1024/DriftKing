@@ -1,10 +1,13 @@
 # Import the pygame library and initialise the game engine
 import pygame
 
+from src.utils.Vector2 import Vector2
+
 
 class Game:
-    def __init__(self):
-        self.game_objects = []
+    def __init__(self, car):
+        self.car = car
+        self.game_objects = [car]
 
     def run(self):
         pygame.init()
@@ -16,17 +19,19 @@ class Game:
         RED = (255, 0, 0)
 
         # Open a new window
-        size = (1400, 1000)
+        size = Vector2(1400, 1000)
         screen = pygame.display.set_mode(size)
         pygame.display.set_caption("Drift King")
 
         # The clock will be used to control how fast the screen updates
         clock = pygame.time.Clock()
+        camera = Vector2(0, 0)
 
         carryOn = True
 
         # -------- Main Program Loop -----------
         while carryOn:
+            camera = -self.car.position + size/2
             # --- Main event loop
             for event in pygame.event.get():  # User did something
                 if event.type == pygame.QUIT:  # If user clicked close
@@ -42,7 +47,7 @@ class Game:
                 entity.tick(keys)
 
             for entity in self.game_objects:
-                entity.draw(pygame.draw, screen)
+                entity.draw(pygame.draw, screen, camera)
 
             # --- Go ahead and update the screen with what we've drawn.
             pygame.display.flip()

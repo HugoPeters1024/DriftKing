@@ -19,7 +19,7 @@ class GameObject(ABC):
         pass
 
     @abstractmethod
-    def draw(self, draw, screen):
+    def draw(self, draw, screen, camera):
         pass
 
     @property

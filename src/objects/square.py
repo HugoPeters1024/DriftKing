@@ -10,5 +10,5 @@ class Square(GameObject):
         if keys[pygame.K_LEFT]:
             self.velocity = Vector2(0, -1)
 
-    def draw(self, draw, screen):
-        draw.rect(screen, (0, 255, 0), [self.x, self.y, 20, 20])
+    def draw(self, draw, screen, camera):
+        draw.rect(screen, (0, 255, 0), [self.x + camera.x, self.y + camera.y, 20, 20])

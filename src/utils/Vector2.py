@@ -39,13 +39,26 @@ class Vector2:
     def __str__(self):
         return f"({self.x}, {self.y})"
 
+    def __getitem__(self, item):
+        if item == 0:
+            return self.x
+        if item == 1:
+            return self.y
+        raise KeyError
+
+    def __len__(self):
+        return 2
+
     @staticmethod
     def dot(a, b):
         return a.x * b.x + a.y * b.y
 
     @staticmethod
     def Sangle(a, b):
-        return acos(Vector2.dot(a, b) * (a.length * b.length))
+        if a.length > 0 and b.length > 0:
+            return acos(Vector2.dot(a, b) / (a.length * b.length))
+        else:
+            return 0
 
     @property
     def angle(self):

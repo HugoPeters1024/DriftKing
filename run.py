@@ -6,14 +6,14 @@ from src.objects.square import Square
 from src.objects.wall import Wall
 from src.utils.Vector2 import Vector2
 
-game = Game()
+car = Car()
+car.position = Vector2(300, 150)
+
+game = Game(car)
 square = Square()
 square.position = Vector2(100, 100)
 game.game_objects.append(square)
 
-car = Car()
-car.position = Vector2(300, 150)
-game.game_objects.append(car)
 
 x = 0
 y = 0
