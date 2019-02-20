@@ -1,8 +1,5 @@
 from math import sqrt
 
-from src.utils.Vector2 import Vector2
-from src.utils.mathx import sign
-
 
 class Line:
     def __init__(self, x1, y1, x2, y2):
@@ -67,8 +64,6 @@ class Line:
             return self.x1 <= x <= self.x2 if dxl > 0 else self.x2 <= x <= self.x1
         else:
             return self.y1 <= y <= self.y2 if dyl > 0 else self.y2 <= y <= self.y1
-
-
 
     def draw(self, draw, screen):
         draw.line(screen, (255, 255, 255), (self.x1, self.y1), (self.x2, self.y2))
