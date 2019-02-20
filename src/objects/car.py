@@ -1,5 +1,6 @@
+from math import pi, sin, cos, atan2
+
 import pygame
-from math import pi, sin, cos, acos, atan, atan2
 
 from src.images.images import CAR, TIRE
 from src.objects.gameobject import GameObject
@@ -40,15 +41,11 @@ class Car(GameObject):
         return Polygon([pt1, pt2, pt3, pt4]).rotated(self.direction.angle)
 
     def draw(self, draw, screen, camera):
-        (tcx, tcy) = TIRE.get_rect().center
-        rotatedTyre = pygame.transform.rotate(TIRE, - self.wheel_angle / pi * 180 * 30)
         car = CAR.copy()
-        car.blit(rotatedTyre, rotatedTyre.get_rect(center=(self.center.x + camera.x + 200, self.center.y + camera.y)))
         rotated = pygame.transform.rotate(car, -self.direction.angle / pi * 180.0)
 
         screen.blit(rotated, rotated.get_rect(center=(self.center.x + camera.x, self.center.y + camera.y)))
-        screen.blit(TIRE, (0,0))
-
+        screen.blit(TIRE, (0, 0))
 
     def _tick(self, keys):
         self.velocity += self.acceleration
