@@ -44,7 +44,6 @@ class Line:
 
         px = p_num_x / p_den_x
         py = p_num_y / p_den_y
-        print(px, py)
 
         return self.has_point(px, py) and other.has_point(px, py)
 
