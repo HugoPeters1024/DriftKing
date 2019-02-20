@@ -14,10 +14,13 @@ class GameObject(ABC):
 
         self._tick(keys)
 
+    def intersects(self, other):
+        return self.bounding_box.intersects(other.bounding_box)
+
     @property
     @abstractmethod
     def bounding_box(self):
-        pass
+        return None
 
     @abstractmethod
     def _tick(self, keys):

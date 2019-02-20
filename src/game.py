@@ -1,6 +1,8 @@
 # Import the pygame library and initialise the game engine
 import pygame
 
+from src.objects.car import Car
+from src.objects.wall import Wall
 from src.utils.Line import Line
 from src.utils.Polygon import Polygon
 from src.utils.Vector2 import Vector2
@@ -10,15 +12,14 @@ class Game:
     def __init__(self, car):
         self.car = car
         self.game_objects = [car]
+        # Is calculated on game start
+        self.walls = []
 
     def run(self):
         pygame.init()
+        self.walls = [x for x in self.game_objects if isinstance(x, Wall)]
 
-        # Define some colors
         BLACK = (0, 0, 0)
-        WHITE = (255, 255, 255)
-        GREEN = (0, 255, 0)
-        RED = (255, 0, 0)
 
         # Open a new window
         size = Vector2(1400, 1000)
@@ -44,31 +45,19 @@ class Game:
             # First, clear the screen to black.
             screen.fill(BLACK)
 
-            square = Polygon(points=[Vector2(0, 0), Vector2(100, 0), Vector2(100, 100), Vector2(0, 100)])
-            square.draw(pygame.draw, screen)
-
-            (mx, my) = pygame.mouse.get_pos()
-            square2 = Polygon([Vector2(mx, my), Vector2(mx + 50, my), Vector2(mx + 50, my + 50), Vector2(mx, my + 50)]).rotated(tick/100.0)
-            square2.draw(pygame.draw, screen)
-            print(square.intersects(square2))
-
-            """
-            line = Line(40, 40, 150, 150)
-            line.draw(pygame.draw, screen)
-
-            (mx, my) = pygame.mouse.get_pos()
-            line2 = Line(mx-20, my+10, mx+40, my+30)
-            line2.draw(pygame.draw, screen)
-
-            print(line.intersects(line2))
-            """
-
             keys = pygame.key.get_pressed()
             for entity in self.game_objects:
                 entity.tick(keys)
 
             for entity in self.game_objects:
-                entity.draw(pygame.draw, screen, camera)
+                if not isinstance(entity, Car):
+                    entity.draw(pygame.draw, screen, camera)
+                else:
+                    for wall in self.walls:
+                        if entity.intersects(wall):
+                            break
+                    else:
+                        entity.draw(pygame.draw, screen, camera)
 
             # --- Go ahead and update the screen with what we've drawn.
             pygame.display.flip()

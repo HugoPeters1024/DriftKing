@@ -1,3 +1,5 @@
+import pygame
+
 from src.utils.Vector2 import Vector2
 from src.utils.Line import Line
 
@@ -6,8 +8,8 @@ class Polygon:
     def __init__(self, points):
         self.points = points
 
-    def draw(self, draw, screen):
-        draw.polygon(screen, (255, 255, 255), self.points)
+    def draw(self, draw, screen, camera):
+        draw.polygon(screen, (255, 255, 255), [p + camera for p in self.points])
 
     def intersects(self, other):
         for myedge in self.edges:

@@ -1,10 +1,16 @@
 from src.objects.gameobject import GameObject
+from src.utils.Polygon import Polygon
+from src.utils.Vector2 import Vector2
 
 
 class Wall(GameObject):
     @property
     def bounding_box(self):
-        pass
+        pt1 = Vector2(self.x1, self.y1 - 1)
+        pt2 = Vector2(self.x2, self.y2 - 1)
+        pt3 = Vector2(self.x2, self.y2 + 1)
+        pt4 = Vector2(self.x1, self.y1 + 1)
+        return Polygon([pt1, pt2, pt3, pt4])
 
     def __init__(self, x1, y1, x2, y2):
         super().__init__()

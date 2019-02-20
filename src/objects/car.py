@@ -3,7 +3,7 @@ from math import pi, sin, cos, acos, atan, atan2
 
 from src.images.images import CAR, TIRE
 from src.objects.gameobject import GameObject
-from src.utils import Polygon
+from src.utils.Polygon import Polygon
 from src.utils.Vector2 import Vector2
 from src.utils.mathx import sign
 
@@ -33,23 +33,22 @@ class Car(GameObject):
 
     @property
     def bounding_box(self):
-        return Polygon(self.x, self.y)
-
+        pt1 = Vector2(self.center.x - 30, self.center.y - 14)
+        pt2 = Vector2(self.center.x + 30, self.center.y - 14)
+        pt3 = Vector2(self.center.x + 30, self.center.y + 14)
+        pt4 = Vector2(self.center.x - 30, self.center.y + 14)
+        return Polygon([pt1, pt2, pt3, pt4]).rotated(self.direction.angle)
 
     def draw(self, draw, screen, camera):
-        (cx, cy) = CAR.get_rect().center
-        # Put the center of gravity slightly to the back.
-        cx += self.direction.x * 20
-        cy += self.direction.y * 20
-
         (tcx, tcy) = TIRE.get_rect().center
-        # rotatedTyre = pygame.transform.rotate(TIRE, - self.wheel_angle / pi * 180 * 30)
+        rotatedTyre = pygame.transform.rotate(TIRE, - self.wheel_angle / pi * 180 * 30)
         car = CAR.copy()
-        # car.blit(rotatedTyre, rotatedTyre.get_rect(center=(tcx + 150, tcy + 100)))
-        # car.blit(rotatedTyre, rotatedTyre.get_rect(center=(tcx + 150, tcy + 105)))
+        car.blit(rotatedTyre, rotatedTyre.get_rect(center=(self.center.x + camera.x + 200, self.center.y + camera.y)))
         rotated = pygame.transform.rotate(car, -self.direction.angle / pi * 180.0)
 
-        screen.blit(rotated, rotated.get_rect(center=(self.x + cx + camera.x, self.y + cy + camera.y)))
+        screen.blit(rotated, rotated.get_rect(center=(self.center.x + camera.x, self.center.y + camera.y)))
+        screen.blit(TIRE, (0,0))
+
 
     def _tick(self, keys):
         self.velocity += self.acceleration
@@ -83,6 +82,11 @@ class Car(GameObject):
             self.breakingForce = 0
 
         self.torque *= 0.98
+
+    @property
+    def center(self):
+        (cx, cy) = CAR.get_rect().center
+        return self.position + Vector2(cx, cy) + self.direction * 20
 
     @property
     def traction(self):
@@ -139,4 +143,3 @@ class Car(GameObject):
             radius = 99999999999  # ~infinity
 
         return self.speed / radius
-
