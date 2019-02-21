@@ -4,6 +4,7 @@ import pygame
 
 from src.images.images import CAR, TIRE
 from src.objects.gameobject import GameObject
+from src.utils.Line import Line
 from src.utils.Polygon import Polygon
 from src.utils.Vector2 import Vector2
 from src.utils.mathx import sign
@@ -24,6 +25,7 @@ class Car(GameObject):
             (7.5, 90)
 
         ]
+        self.sensors = []
 
         self.engineForce = 0.0
         self.breakingForce = 0
@@ -31,6 +33,20 @@ class Car(GameObject):
         self.drag_constant = 0.4257
         self.rolling_resistance_constant = 6
         self.cornering_stiffness = 0.4
+
+    def project_sensors(self, walls):
+        lines = []
+        for i in range(3):
+            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.4 + 0.8 * ((i+1)/4)) + self.center)
+
+        cutoffs = []
+        for line in lines:
+            cutoff = line
+            for wall in walls:
+                for edge in wall.bounding_box:
+                    cutoff = cutoff.cutoff(edge)
+            cutoffs.append(cutoff)
+        self.sensors = cutoffs
 
     @property
     def bounding_box(self):
@@ -46,6 +62,8 @@ class Car(GameObject):
 
         screen.blit(rotated, rotated.get_rect(center=(self.center.x + camera.x, self.center.y + camera.y)))
         screen.blit(TIRE, (0, 0))
+        for line in self.sensors:
+            (line + camera).draw(draw, screen)
 
     def _tick(self, keys):
         self.velocity += self.acceleration

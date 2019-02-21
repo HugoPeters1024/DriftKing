@@ -1,7 +1,7 @@
 import pygame
 
-from src.utils.Vector2 import Vector2
 from src.utils.Line import Line
+from src.utils.Vector2 import Vector2
 
 
 class Polygon:
@@ -54,6 +54,9 @@ class Polygon:
 
         f = twicearea * 3
         return Vector2(x / f + off.x, y / f + off.y)
+
+    def __iter__(self):
+        return self.edges.__iter__()
 
 
 

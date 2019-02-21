@@ -57,6 +57,7 @@ class Game:
                         if entity.intersects(wall):
                             break
                     else:
+                        entity.project_sensors(self.walls)
                         entity.draw(pygame.draw, screen, camera)
 
             # --- Go ahead and update the screen with what we've drawn.
