@@ -36,8 +36,8 @@ class Car(GameObject):
 
     def project_sensors(self, walls):
         lines = []
-        for i in range(3):
-            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.4 + 0.8 * ((i+1)/4)) + self.center)
+        for i in range(8):
+            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.4 + 0.8 * ((i+1)/8)) + self.center)
 
         cutoffs = []
         for line in lines:

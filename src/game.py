@@ -50,15 +50,9 @@ class Game:
                 entity.tick(keys)
 
             for entity in self.game_objects:
-                if not isinstance(entity, Car):
-                    entity.draw(pygame.draw, screen, camera)
-                else:
-                    for wall in self.walls:
-                        if entity.intersects(wall):
-                            break
-                    else:
-                        entity.project_sensors(self.walls)
-                        entity.draw(pygame.draw, screen, camera)
+                entity.draw(pygame.draw, screen, camera)
+
+            self.car.project_sensors(self.walls)
 
             # --- Go ahead and update the screen with what we've drawn.
             pygame.display.flip()
