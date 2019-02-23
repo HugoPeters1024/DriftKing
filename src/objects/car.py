@@ -2,7 +2,7 @@ from math import pi, sin, cos, atan2
 
 import pygame
 
-from src.images.images import CAR, TIRE
+from src.images.resources import CAR, TIRE, FONT
 from src.objects.gameobject import GameObject
 from src.utils.Line import Line
 from src.utils.Polygon import Polygon
@@ -11,21 +11,27 @@ from src.utils.mathx import sign
 
 
 class Car(GameObject):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, neuralNet):
+        self.neuralNet = neuralNet
+
+        self.position = Vector2(0, 0)
+        self.velocity = Vector2(0, 0)
         # Environmental constants
         self.mass = 200
         self.length = 2
         self.wheel_angle = 0.0
-        self.max_wheel_angle = 0.4
+        self.max_wheel_angle = 0.8
         self.torque = 0
         self.gears = [
-            (4, 60),
-            (6.5, 75),
-            (7.5, 90)
+            (4, 90),
+            (6.5, 140),
+            (7.5, 180)
 
         ]
+        self.score = 0
+        self.checkpoints = []
         self.sensors = []
+        self.dead = False
 
         self.engineForce = 0.0
         self.breakingForce = 0
@@ -36,8 +42,8 @@ class Car(GameObject):
 
     def project_sensors(self, walls):
         lines = []
-        for i in range(8):
-            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.4 + 0.8 * ((i+1)/8)) + self.center)
+        for i in range(3):
+            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.4 + 0.8 * (i/2)) + self.center)
 
         cutoffs = []
         for line in lines:
@@ -57,23 +63,31 @@ class Car(GameObject):
         return Polygon([pt1, pt2, pt3, pt4]).rotated(self.direction.angle)
 
     def draw(self, draw, screen, camera):
+        if self.dead:
+            return
         car = CAR.copy()
         rotated = pygame.transform.rotate(car, -self.direction.angle / pi * 180.0)
 
         screen.blit(rotated, rotated.get_rect(center=(self.center.x + camera.x, self.center.y + camera.y)))
-        screen.blit(TIRE, (0, 0))
         for line in self.sensors:
             (line + camera).draw(draw, screen)
+        #text = FONT.render(str(self.score), False, (255, 255, 255))
+        #screen.blit(text, self.center + camera - Vector2(0, 100))
 
     def _tick(self, keys):
+        if self.dead:
+            return
+        self.position += self.velocity
         self.velocity += self.acceleration
         self.direction = self.direction.rotate(self.angular_momentum / 30)
+        # self.score += self.speed
 
         ready_force = 40
         for (threshold, force) in self.gears:
             if self.speed > threshold:
                 ready_force = force
 
+        """
         if keys[pygame.K_w]:
             self.engineForce = ready_force
         elif keys[pygame.K_s]:
@@ -95,8 +109,20 @@ class Car(GameObject):
             self.breakingForce = 10
         else:
             self.breakingForce = 0
+        """
 
         self.torque *= 0.98
+
+        input = [x.length / 500.0 for x in self.sensors]
+        input.append(self.speed / 5)
+        input.append(self.wheel_angle / self.max_wheel_angle)
+        output = self.neuralNet.activate(input)
+        self.engineForce = ready_force * output[0]
+        wheel_left = output[1]
+        wheel_right = output[2]
+        wheel_output = wheel_right - wheel_left
+        wheel_output = (wheel_output ** 2) * sign(wheel_output)
+        self.wheel_angle = self.max_wheel_angle * wheel_output * wheel_output * sign(wheel_output)
 
     @property
     def center(self):
@@ -138,7 +164,7 @@ class Car(GameObject):
         front_force = front
 
         total = rear_force + cos(self.wheel_angle) * front_force
-        # self.torque += (-rear_force + cos(self.wheel_angle) * front_force) / 90.0
+        #self.torque += (-rear_force + cos(self.wheel_angle) * front_force) / 90.0
 
         return Vector2(-self.velocity.y, self.velocity.x) * -total * self.cornering_stiffness
 

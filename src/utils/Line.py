@@ -38,7 +38,6 @@ class Line:
     def intersection_length(self, other):
         if not self.intersects(other):
             return float("inf")
-
         x1 = self.x1
         x2 = self.x2
         x3 = other.x1

@@ -4,14 +4,7 @@ from src.utils.Vector2 import Vector2
 
 
 class GameObject(ABC):
-    def __init__(self):
-        self.position = Vector2(0, 0)
-        self.velocity = Vector2(0, 0)
-
     def tick(self, keys):
-        # Basic psychics
-        self.position += self.velocity
-
         self._tick(keys)
 
     def intersects(self, other):
