@@ -42,8 +42,8 @@ class Car(GameObject):
 
     def project_sensors(self, walls):
         lines = []
-        for i in range(3):
-            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.4 + 0.8 * (i/2)) + self.center)
+        for i in range(5):
+            lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.8 + 1.6*(i/4)) + self.center)
 
         cutoffs = []
         for line in lines:
@@ -113,13 +113,13 @@ class Car(GameObject):
 
         self.torque *= 0.98
 
-        input = [x.length / 500.0 for x in self.sensors]
-        input.append(self.speed / 5)
+        input = [min(max(1 - x.length / 500.0, 0), 1) for x in self.sensors]
+        input.append(self.speed / 35)
         input.append(self.wheel_angle / self.max_wheel_angle)
         output = self.neuralNet.activate(input)
-        self.engineForce = ready_force * output[0]
-        wheel_left = output[1]
-        wheel_right = output[2]
+        self.engineForce = ready_force * (output[0] - 0.5 * output[1])
+        wheel_left = output[2]
+        wheel_right = output[3]
         wheel_output = wheel_right - wheel_left
         wheel_output = (wheel_output ** 2) * sign(wheel_output)
         self.wheel_angle = self.max_wheel_angle * wheel_output * wheel_output * sign(wheel_output)

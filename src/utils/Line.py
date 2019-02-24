@@ -87,7 +87,7 @@ class Line:
         return Line(self.x1, self.y1, dir.x + self.x1, dir.y + self.y1)
 
     def draw(self, draw, screen):
-        draw.line(screen, (255, 255, 255), (self.x1, self.y1), (self.x2, self.y2))
+        draw.line(screen, (128, 128, 128), (self.x1, self.y1), (self.x2, self.y2))
 
     @property
     def length(self):

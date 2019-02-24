@@ -15,35 +15,57 @@ def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         car = Car(net)
-        car.position = Vector2(680, 220)
+        car.position = Vector2(200, 200)
         cars.append(car)
     game = Game(cars)
     center = Vector2(700, 500)
 
-    for i in range(30):
-        ratio = (i / 30.0) * (2 * pi)
-        ratio2 = ((i + 1) / 30.0) * (2 * pi)
-        dis = 200
-        pt1 = Vector2(cos(ratio), sin(ratio)) * dis + center
-        pt2 = Vector2(cos(ratio2), sin(ratio2)) * dis + center
+    scalar = Vector2(140, 75)
 
+    points = [
+        Vector2(1, 1),
+        Vector2(5, 0),
+        Vector2(9, 1),
+        Vector2(9, 10),
+        Vector2(5, 10),
+        Vector2(6, 6),
+        Vector2(3, 9),
+        Vector2(1, 10),
+    ]
+
+    for i in range(len(points)):
+        pt1 = points[i] * scalar
+        pt2 = points[(i+1)%len(points)] * scalar
         wall = Wall(pt1.x, pt1.y, pt2.x, pt2.y)
         game.game_objects.append(wall)
 
-    for i in range(30):
-        ratio = (i / 30.0) * (2 * pi)
-        ratio2 = ((i + 1) / 30.0) * (2 * pi)
-        dis = 300
-        pt1 = Vector2(cos(ratio), sin(ratio)) * dis + center
-        pt2 = Vector2(cos(ratio2), sin(ratio2)) * dis + center
+    points2 = [
+        Vector2(1.4, 4.5),
+        Vector2(5, 2),
+        Vector2(8, 3),
+        Vector2(7, 8)
+    ]
 
+    thepoint = points[5] * scalar
+    extra = CheckPoint(thepoint.x, thepoint.y, thepoint.x + 80, thepoint.y - 265)
+    game.game_objects.append(extra)
+    thepoint = points2[0] * scalar
+    extra = CheckPoint(thepoint.x, thepoint.y, thepoint.x - 80, thepoint.y)
+    game.game_objects.append(extra)
+
+
+    for i in range(len(points2)-1):
+        pt1 = points2[i] * scalar
+        pt2 = points2[(i+1)] * scalar
         wall = Wall(pt1.x, pt1.y, pt2.x, pt2.y)
         game.game_objects.append(wall)
-        checkpoint = CheckPoint(pt1.x, pt1.y, pt1.x - 100 * cos(ratio), pt1.y - 100 * sin(ratio))
-        game.game_objects.append(checkpoint)
+
+        for pt_check in points:
+            pt_check = pt_check * scalar
+            check = CheckPoint(pt1.x, pt1.y, pt_check.x, pt_check.y)
+            game.game_objects.append(check)
 
     scores = game.run()
-    # scores = [x / sum(scores) for x in scores]
     print(scores)
     for (genome_id, genome), score in zip(genomes, scores):
         print(f"car {genome_id}: {score}")

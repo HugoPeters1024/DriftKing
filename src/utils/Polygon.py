@@ -26,6 +26,9 @@ class Polygon:
             a = self.points[i]
             b = self.points[(i+1) % l]
             result.append(Line(a.x, a.y, b.x, b.y))
+        # line just needs one edge
+        if l == 2:
+            return [result[0]]
         return result
 
     def rotated(self, angle):

@@ -51,6 +51,7 @@ class Game:
                 car.tick(None)
                 for wall in self.walls:
                     if car.intersects(wall):
+                        car.score -= 10
                         car.dead = True
                 for checkpoint in self.checkpoints:
                     if checkpoint not in car.checkpoints:
