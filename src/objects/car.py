@@ -11,23 +11,36 @@ from src.utils.mathx import sign
 
 
 class Car(GameObject):
+    """
+    Agent that take the genotype in the form of a neural net and executes it s command to realize it's fenotype.
+    """
     def __init__(self, neuralNet):
+        # Obtained from the genome
         self.neuralNet = neuralNet
 
         self.position = Vector2(0, 0)
         self.velocity = Vector2(0, 0)
+        self.direction = Vector2(1, 0)
+
         # Environmental constants
         self.mass = 200
         self.length = 2
         self.wheel_angle = 0.0
         self.max_wheel_angle = 0.8
-        self.torque = 0
+        self.drag_constant = 0.4257
+        self.rolling_resistance_constant = 6
+        self.cornering_stiffness = 0.4
+
+        # left: speed.
+        # right: newton of engine force available from that speed on.
         self.gears = [
+            (0, 40),
             (4, 90),
             (6.5, 140),
             (7.5, 180)
 
         ]
+
         self.score = 0
         self.checkpoints = []
         self.sensors = []
@@ -35,12 +48,11 @@ class Car(GameObject):
 
         self.engineForce = 0.0
         self.breakingForce = 0
-        self.direction = Vector2(1, 0)
-        self.drag_constant = 0.4257
-        self.rolling_resistance_constant = 6
-        self.cornering_stiffness = 0.4
 
     def project_sensors(self, walls):
+        """
+        Checks the distance sensors against the given walls.
+        """
         lines = []
         for i in range(5):
             lines.append(Line(0, 0, self.direction.x * 1000, self.direction.y * 1000).rotate(-0.8 + 1.6*(i/4)) + self.center)
@@ -66,13 +78,14 @@ class Car(GameObject):
         if self.dead:
             return
         car = CAR.copy()
+
+        # rotate the car (whilst converting radians to degrees)
         rotated = pygame.transform.rotate(car, -self.direction.angle / pi * 180.0)
 
+        # Draw the car and sensors to the screen.
         screen.blit(rotated, rotated.get_rect(center=(self.center.x + camera.x, self.center.y + camera.y)))
         for line in self.sensors:
             (line + camera).draw(draw, screen)
-        #text = FONT.render(str(self.score), False, (255, 255, 255))
-        #screen.blit(text, self.center + camera - Vector2(0, 100))
 
     def _tick(self, keys):
         if self.dead:
@@ -80,43 +93,24 @@ class Car(GameObject):
         self.position += self.velocity
         self.velocity += self.acceleration
         self.direction = self.direction.rotate(self.angular_momentum / 30)
-        # self.score += self.speed
 
-        ready_force = 40
+        # Add small incentive to drive fast
+        self.score += self.speed / 20.0
+
         for (threshold, force) in self.gears:
-            if self.speed > threshold:
+            if self.speed >= threshold:
                 ready_force = force
 
-        """
-        if keys[pygame.K_w]:
-            self.engineForce = ready_force
-        elif keys[pygame.K_s]:
-            self.engineForce = -10
-        else:
-            self.engineForce = 0
-
-        if keys[pygame.K_a]:
-            if self.wheel_angle > -self.max_wheel_angle:
-                self.wheel_angle -= 0.01
-        elif keys[pygame.K_d]:
-            if self.wheel_angle < self.max_wheel_angle:
-                self.wheel_angle += 0.01
-        else:
-            if self.wheel_angle != 0:
-                self.wheel_angle += (0 - self.wheel_angle) * self.speed / 109.0
-
-        if keys[pygame.K_SPACE]:
-            self.breakingForce = 10
-        else:
-            self.breakingForce = 0
-        """
-
-        self.torque *= 0.98
-
+        # normalize the sensor input
         input = [min(max(1 - x.length / 500.0, 0), 1) for x in self.sensors]
-        input.append(self.speed / 35)
+        # add normalized version of the speed
+        input.append(min(self.speed / 10, 1))
+        # add normalized version of the wheel angle.
         input.append(self.wheel_angle / self.max_wheel_angle)
+
+        # Yield output by propagating the input through the network.
         output = self.neuralNet.activate(input)
+        # Assign output neurons to engine force and wheel angle.
         self.engineForce = ready_force * (output[0] - 0.5 * output[1])
         wheel_left = output[2]
         wheel_right = output[3]
@@ -164,7 +158,6 @@ class Car(GameObject):
         front_force = front
 
         total = rear_force + cos(self.wheel_angle) * front_force
-        #self.torque += (-rear_force + cos(self.wheel_angle) * front_force) / 90.0
 
         return Vector2(-self.velocity.y, self.velocity.x) * -total * self.cornering_stiffness
 
@@ -174,10 +167,6 @@ class Car(GameObject):
 
     @property
     def angular_momentum(self):
-        return self.steer_momentum + self.torque
-
-    @property
-    def steer_momentum(self):
         if self.wheel_angle != 0:
             radius = self.length / sin(self.wheel_angle)
         else:
