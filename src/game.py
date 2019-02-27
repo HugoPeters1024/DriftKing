@@ -32,14 +32,17 @@ class Game:
 
         tick = 0
         carryOn = True
+        camera = Vector2(0, 0)
 
         # -------- Main Program Loop -----------
         while carryOn:
             tick += 1
             if tick > 1000 or all([x.dead for x in self.cars]):
                 return [x.score for x in self.cars]
-            # camera = -self.car.position + size / 2
-            camera = Vector2(0, 0)
+
+            best_score = max([x.score for x in self.cars if not x.dead])
+            target_camera = -[x for x in self.cars if x.score == best_score][0].position + size / 2
+            camera += (target_camera - camera) / 10
             # --- Main event loop
             for event in pygame.event.get():  # User did something
                 if event.type == pygame.QUIT:  # If user clicked close
@@ -60,7 +63,7 @@ class Game:
                             car.checkpoints.append(checkpoint)
                             checkpoint.show = False
 
-            if tick % 3 == 0:
+            if tick % 10 == 0:
                 # First, clear the screen to black.
                 screen.fill(BLACK)
                 for entity in self.game_objects:
@@ -69,7 +72,7 @@ class Game:
                     car.draw(pygame.draw, screen, camera)
 
             # --- Go ahead and update the screen with what we've drawn.
-            if tick % 3 == 0:
+            if tick % 10 == 0:
                 pygame.display.flip()
 
             # --- Limit to 60 frames per second

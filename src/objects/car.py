@@ -170,6 +170,6 @@ class Car(GameObject):
         if self.wheel_angle != 0:
             radius = self.length / sin(self.wheel_angle)
         else:
-            radius = float("inf")  # ~infinity
+            return 0
 
         return self.speed / radius
