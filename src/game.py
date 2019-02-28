@@ -1,4 +1,6 @@
 # Import the pygame library and initialise the game engine
+from multiprocessing import Queue, Process, Lock
+
 import pygame
 
 from src.objects.car import Car
@@ -25,19 +27,26 @@ class Game:
 
         BLACK = (0, 0, 0)
 
+
         # Open a new window
         size = Vector2(1400, 1000)
         screen = pygame.display.set_mode(size)
         pygame.display.set_caption("Drift King")
 
-        tick = 0
         carryOn = True
         camera = Vector2(0, 0)
 
+        input = Queue()
+        output = Queue()
+        for i in range(len(self.cars)):
+            input.put((i, self.cars[i]))
+            p = Process(target=work, args=(input, output, self))
+            p.start()
+
+
         # -------- Main Program Loop -----------
         while carryOn:
-            tick += 1
-            if tick > 1000 or all([x.dead for x in self.cars]):
+            if all([x.dead for x in self.cars]):
                 return [x.score for x in self.cars]
 
             best_score = max([x.score for x in self.cars if not x.dead])
@@ -49,6 +58,10 @@ class Game:
                     carryOn = False
                     break
 
+            for i in range(len([x for x in self.cars if not x.dead])):
+                (index, car) = output.get()
+                self.cars[index] = car
+            """
             for car in [x for x in self.cars if not x.dead]:
                 car.project_sensors(self.walls)
                 car.tick(None)
@@ -62,21 +75,44 @@ class Game:
                             car.score += 10
                             car.checkpoints.append(checkpoint)
                             checkpoint.show = False
+            """
 
-            if tick % 10 == 0:
-                # First, clear the screen to black.
-                screen.fill(BLACK)
-                for entity in self.game_objects:
-                    entity.draw(pygame.draw, screen, camera)
-                for car in self.cars:
-                    car.draw(pygame.draw, screen, camera)
+            # First, clear the screen to black.
+            screen.fill(BLACK)
+            for entity in self.game_objects:
+                entity.draw(pygame.draw, screen, camera)
+            for car in self.cars:
+                car.draw(pygame.draw, screen, camera)
 
             # --- Go ahead and update the screen with what we've drawn.
-            if tick % 10 == 0:
-                pygame.display.flip()
+            pygame.display.flip()
 
             # --- Limit to 60 frames per second
             # clock.tick(60)
 
         # Once we have exited the main program loop we can stop the game engine:
         pygame.quit()
+
+
+def work(input, output, game):
+    ticks = 0
+    (index, car) = input.get()
+    while not car.dead and ticks < 1000:
+        car.project_sensors(game.walls)
+        car.tick(None)
+        for wall in game.walls:
+            if car.intersects(wall):
+                car.score -= 10
+                car.dead = True
+        for checkpoint in game.checkpoints:
+            if checkpoint not in car.checkpoints:
+                if car.intersects(checkpoint):
+                    car.score += 10
+                    car.checkpoints.append(checkpoint)
+                    checkpoint.show = False
+        if ticks % 5 == 0:
+            output.put((index, car))
+        ticks += 1
+    car.dead = True
+    output.put((index, car))
+    return
