@@ -36,17 +36,22 @@ class Game:
         carryOn = True
         camera = Vector2(0, 0)
 
-        input = Queue()
-        output = Queue()
+        processes = []
+        input = Queue(500)
+        output = Queue(500)
         for i in range(len(self.cars)):
             input.put((i, self.cars[i]))
             p = Process(target=work, args=(input, output, self))
             p.start()
-
+            processes.append(p)
 
         # -------- Main Program Loop -----------
         while carryOn:
             if all([x.dead for x in self.cars]):
+                # Flush the interprocess queue to prevent deadlock
+                while not output.empty():
+                    (_, _) = output.get()
+                [p.join() for p in processes]
                 return [x.score for x in self.cars]
 
             best_score = max([x.score for x in self.cars if not x.dead])
@@ -61,21 +66,6 @@ class Game:
             for i in range(len([x for x in self.cars if not x.dead])):
                 (index, car) = output.get()
                 self.cars[index] = car
-            """
-            for car in [x for x in self.cars if not x.dead]:
-                car.project_sensors(self.walls)
-                car.tick(None)
-                for wall in self.walls:
-                    if car.intersects(wall):
-                        car.score -= 10
-                        car.dead = True
-                for checkpoint in self.checkpoints:
-                    if checkpoint not in car.checkpoints:
-                        if car.intersects(checkpoint):
-                            car.score += 10
-                            car.checkpoints.append(checkpoint)
-                            checkpoint.show = False
-            """
 
             # First, clear the screen to black.
             screen.fill(BLACK)
@@ -87,9 +77,6 @@ class Game:
             # --- Go ahead and update the screen with what we've drawn.
             pygame.display.flip()
 
-            # --- Limit to 60 frames per second
-            # clock.tick(60)
-
         # Once we have exited the main program loop we can stop the game engine:
         pygame.quit()
 
@@ -97,7 +84,7 @@ class Game:
 def work(input, output, game):
     ticks = 0
     (index, car) = input.get()
-    while not car.dead and ticks < 1000:
+    while (not car.dead) and ticks < 1000:
         car.project_sensors(game.walls)
         car.tick(None)
         for wall in game.walls:
@@ -110,8 +97,7 @@ def work(input, output, game):
                     car.score += 10
                     car.checkpoints.append(checkpoint)
                     checkpoint.show = False
-        if ticks % 5 == 0:
-            output.put((index, car))
+        output.put((index, car))
         ticks += 1
     car.dead = True
     output.put((index, car))

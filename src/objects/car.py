@@ -102,19 +102,17 @@ class Car(GameObject):
                 ready_force = force
 
         # normalize the sensor input
-        input = [min(max(1 - x.length / 500.0, 0), 1) for x in self.sensors]
+        input = [min(max(1 - x.length / 500.0, 0), 1) * 2 - 1 for x in self.sensors]
         # add normalized version of the speed
-        input.append(min(self.speed / 10, 1))
+        input.append(min(self.speed / 10, 1) * 2 -1)
         # add normalized version of the wheel angle.
         input.append(self.wheel_angle / self.max_wheel_angle)
 
         # Yield output by propagating the input through the network.
         output = self.neuralNet.activate(input)
         # Assign output neurons to engine force and wheel angle.
-        self.engineForce = ready_force * (output[0] - 0.5 * output[1])
-        wheel_left = output[2]
-        wheel_right = output[3]
-        wheel_output = wheel_right - wheel_left
+        self.engineForce = ready_force * (output[0] if output[0] > 0 else 0.25 * output[0])
+        wheel_output = output[1]
         wheel_output = (wheel_output ** 2) * sign(wheel_output)
         self.wheel_angle = self.max_wheel_angle * wheel_output * wheel_output * sign(wheel_output)
 
