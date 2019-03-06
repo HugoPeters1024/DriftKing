@@ -1,13 +1,10 @@
 # Import the pygame library and initialise the game engine
-from multiprocessing import Queue, Process, Lock
+from multiprocessing import Queue, Process
 
 import pygame
 
-from src.objects.car import Car
 from src.objects.checkpoint import CheckPoint
 from src.objects.wall import Wall
-from src.utils.Line import Line
-from src.utils.Polygon import Polygon
 from src.utils.Vector2 import Vector2
 
 
@@ -27,7 +24,6 @@ class Game:
 
         BLACK = (0, 0, 0)
 
-
         # Open a new window
         size = Vector2(1400, 1000)
         screen = pygame.display.set_mode(size)
@@ -35,6 +31,7 @@ class Game:
 
         carryOn = True
         camera = Vector2(0, 0)
+        clock = pygame.time.Clock()
 
         processes = []
         input = Queue(500)
@@ -77,6 +74,8 @@ class Game:
             # --- Go ahead and update the screen with what we've drawn.
             pygame.display.flip()
 
+            #clock.tick(60)
+
         # Once we have exited the main program loop we can stop the game engine:
         pygame.quit()
 
@@ -91,6 +90,8 @@ def work(input, output, game):
             if car.intersects(wall):
                 car.score -= 10
                 car.dead = True
+                output.put((index, car))
+                return
         for checkpoint in game.checkpoints:
             if checkpoint not in car.checkpoints:
                 if car.intersects(checkpoint):
