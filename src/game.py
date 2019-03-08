@@ -21,6 +21,7 @@ class Game:
         pygame.font.init()
         self.walls = [x for x in self.game_objects if isinstance(x, Wall)]
         self.checkpoints = [x for x in self.game_objects if isinstance(x, CheckPoint)]
+        print([f"CheckPoint({c.x1}, {c.y1}, {c.x2}, {c.y2})" for c in self.checkpoints])
 
         BLACK = (0, 0, 0)
 

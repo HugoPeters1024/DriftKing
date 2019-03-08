@@ -1,5 +1,4 @@
 import pickle
-
 import neat
 
 from level1 import walls, checkpoints
