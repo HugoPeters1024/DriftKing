@@ -21,7 +21,6 @@ def eval_genomes(genomes, config):
     game.game_objects.extend(checkpoints)
 
     scores = game.run()
-    print(scores)
     for (genome_id, genome), score in zip(genomes, scores):
         print(f"car {genome_id}: {score}")
         genome.fitness = score
@@ -31,11 +30,13 @@ config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                      neat.DefaultSpeciesSet, neat.DefaultStagnation,
                      'config-feedforward')
 
+config.__setattr__("fitness_threshold", len(checkpoints) * 10 + 10)
+
 p = neat.Population(config)
 
 p.add_reporter(neat.StdOutReporter(False))
 
-winner = p.run(eval_genomes, 300)
+winner = p.run(eval_genomes)
 print(winner)
 with open("winner.bin", "wb") as f:
     pickle.dump(winner, f, 2)

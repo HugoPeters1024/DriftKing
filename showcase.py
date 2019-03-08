@@ -8,6 +8,10 @@ from src.utils.Vector2 import Vector2
 
 from level1 import walls, checkpoints
 
+
+"""
+This file reads the neural network configuration saved in the 'winner.bin' file and shows its performance.
+"""
 if __name__ == "__main__":
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
