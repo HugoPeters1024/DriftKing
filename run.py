@@ -1,3 +1,5 @@
+import pickle
+
 import neat
 
 from level1 import walls, checkpoints
@@ -34,4 +36,7 @@ p = neat.Population(config)
 p.add_reporter(neat.StdOutReporter(False))
 
 winner = p.run(eval_genomes, 300)
+print(winner)
+with open("winner.bin", "wb") as f:
+    pickle.dump(winner, f, 2)
 
