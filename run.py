@@ -1,6 +1,6 @@
 import neat
 
-from level1 import walls, checkpoints
+from level2 import walls, checkpoints
 from src.game import Game
 from src.objects.car import Car
 from src.utils.Vector2 import Vector2
