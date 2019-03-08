@@ -62,7 +62,9 @@ Wall(22, 394, 23, 363),
 Wall(74, 253, 98, 275),
 Wall(98, 275, 80, 312),
 Wall(80, 312, 62, 283),
-Wall(62, 283, 74, 253)] 
+Wall(62, 283, 74, 253)]
+
+[x * 3 for x in walls]
 
 checkpoints = [CheckPoint(52, 9, 52, 45),
 CheckPoint(234, 9, 234, 48),
@@ -85,3 +87,5 @@ CheckPoint(119, 445, 9, 436),
 CheckPoint(121, 371, 8, 361),
 CheckPoint(126, 250, 7, 250),
 CheckPoint(7, 107, 51, 107)]
+
+[x * 3 for x in checkpoints]

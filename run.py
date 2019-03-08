@@ -12,7 +12,7 @@ def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         car = Car(net)
-        car.position = Vector2(200, 200)
+        car.position = Vector2(20, 70)
         cars.append(car)
 
     game = Game(cars)

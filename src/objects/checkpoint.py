@@ -24,3 +24,9 @@ class CheckPoint(GameObject):
         pt2 = Vector2(self.x2, self.y2)
         return Polygon([pt1, pt2])
 
+    def __mul__(self, other):
+        self.x1 *= other
+        self.y1 *= other
+        self.x2 *= other
+        self.y2 *= other
+

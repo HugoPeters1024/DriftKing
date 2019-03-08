@@ -9,6 +9,7 @@ pylint = "*"
 [packages]
 pygame = "*"
 neat-python = "*"
+graphviz = "*"
 
 [requires]
 python_version = "3.7"

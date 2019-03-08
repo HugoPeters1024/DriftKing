@@ -8,6 +8,8 @@ from src.utils.Vector2 import Vector2
 
 from level1 import walls, checkpoints
 
+from plotting import draw_net
+
 
 """
 This file reads the neural network configuration saved in the 'winner.bin' file and shows its performance.
@@ -19,6 +21,7 @@ if __name__ == "__main__":
 
     with open("winner.bin", "rb") as f:
         genome = pickle.load(f)
+    draw_net(config, genome, True)
     net = neat.nn.FeedForwardNetwork.create(genome, config)
     car = Car(net)
     car.position = Vector2(200, 200)
