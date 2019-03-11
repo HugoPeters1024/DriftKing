@@ -1,10 +1,6 @@
 from src.objects.checkpoint import CheckPoint
 from src.objects.wall import Wall
 
-checkpoints = []
-
-
-
 walls = [Wall(7, 10, 232, 10),#outside walls start
 Wall(232, 10, 327, 78),
 Wall(327, 78, 392, 8),
