@@ -1,10 +1,6 @@
 from src.objects.checkpoint import CheckPoint
 from src.objects.wall import Wall
 
-checkpoints = []
-
-
-
 walls = [Wall(7, 10, 232, 10),#outside walls start
 Wall(232, 10, 327, 78),
 Wall(327, 78, 392, 8),
@@ -86,6 +82,26 @@ CheckPoint(114, 526, 112, 594),
 CheckPoint(119, 445, 9, 436),
 CheckPoint(121, 371, 8, 361),
 CheckPoint(126, 250, 7, 250),
-CheckPoint(7, 107, 51, 107)]
+CheckPoint(7, 107, 51, 107),
+CheckPoint(138, 10, 138, 44),
+CheckPoint(265, 73, 285, 47),
+CheckPoint(390, 90, 328, 77),
+CheckPoint(403, 64, 385, 15),
+CheckPoint(461, 31, 454, 113),
+CheckPoint(557, 67, 532, 128),
+CheckPoint(629, 191, 575, 196),
+CheckPoint(547, 298, 603, 325),
+CheckPoint(599, 452, 529, 460),
+CheckPoint(499, 528, 510, 589),
+CheckPoint(405, 580, 410, 523),
+CheckPoint(342, 517, 256, 482),
+CheckPoint(380, 465, 306, 413),
+CheckPoint(431, 311, 351, 298),
+CheckPoint(409, 192, 426, 111),
+CheckPoint(230, 518, 150, 456),
+CheckPoint(116, 492, 9, 494),
+CheckPoint(120, 407, 8, 405),
+CheckPoint(124, 312, 8, 316),
+CheckPoint(89, 157, 8, 193)]
 
 [x * 3 for x in checkpoints]
