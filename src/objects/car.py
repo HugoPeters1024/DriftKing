@@ -14,9 +14,10 @@ class Car(GameObject):
     """
     Agent that take the genotype in the form of a neural net and executes it s command to realize it's fenotype.
     """
-    def __init__(self, neuralNet):
+    def __init__(self, neuralNet, alpha):
         # Obtained from the genome
         self.neuralNet = neuralNet
+        self.alpha = alpha;
 
         self.position = Vector2(0, 0)
         self.velocity = Vector2(0, 0)
@@ -42,7 +43,7 @@ class Car(GameObject):
         ]
 
         self.score = 0
-        self.checkpoints = []
+        self.checkpoints = 0
         self.sensors = []
         self.dead = False
 
@@ -95,7 +96,7 @@ class Car(GameObject):
         self.direction = self.direction.rotate(self.angular_momentum / 30)
 
         # Add small incentive to drive fast
-        self.score += self.speed / 20.0
+        self.score += self.speed * self.alpha
 
         for (threshold, force) in self.gears:
             if self.speed >= threshold:

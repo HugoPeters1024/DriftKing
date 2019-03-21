@@ -21,7 +21,6 @@ class Game:
         pygame.font.init()
         self.walls = [x for x in self.game_objects if isinstance(x, Wall)]
         self.checkpoints = [x for x in self.game_objects if isinstance(x, CheckPoint)]
-        print([f"CheckPoint({c.x1}, {c.y1}, {c.x2}, {c.y2})" for c in self.checkpoints])
 
         BLACK = (0, 0, 0)
 
@@ -49,7 +48,7 @@ class Game:
                 # Flush the interprocess queue to prevent deadlock
                 while not output.empty():
                     (_, _) = output.get()
-                [p.join() for p in processes]
+                [p.join(1) for p in processes]
                 return [x.score for x in self.cars]
 
             best_score = max([x.score for x in self.cars if not x.dead])
@@ -83,8 +82,9 @@ class Game:
 
 def work(input, output, game):
     ticks = 0
+    ticks_since_checkpoint = 0;
     (index, car) = input.get()
-    while (not car.dead) and ticks < 1000:
+    while (not car.dead) and ticks_since_checkpoint < 300:
         car.project_sensors(game.walls)
         car.tick(None)
         for wall in game.walls:
@@ -92,15 +92,18 @@ def work(input, output, game):
                 car.score -= 10
                 car.dead = True
                 output.put((index, car))
+                # print(f"{index} dead")
                 return
-        for checkpoint in game.checkpoints:
-            if checkpoint not in car.checkpoints:
-                if car.intersects(checkpoint):
-                    car.score += 10
-                    car.checkpoints.append(checkpoint)
-                    checkpoint.show = False
+        for checkpoint in filter(lambda x: x.show, game.checkpoints):
+            if car.intersects(checkpoint):
+                car.score += 10
+                car.checkpoints += 1
+                ticks_since_checkpoint = 0
+                checkpoint.show = False
         output.put((index, car))
         ticks += 1
+        ticks_since_checkpoint += 1
     car.dead = True
     output.put((index, car))
+    #  print(f"{index} dead")
     return
