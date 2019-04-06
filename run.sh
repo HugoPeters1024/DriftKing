@@ -1,3 +1,6 @@
 #!/bin/bash
 alpha=0.025
-pipenv run python run.py $alpha 0
+for i in {29..30}
+do
+  pipenv run python run.py $alpha $i
+done
